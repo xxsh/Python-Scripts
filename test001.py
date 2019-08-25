@@ -17,16 +17,14 @@ def calculation(starting_time, deadline):
     df1 = pd.DataFrame()
     df1['DATE0'] = pd.to_datetime(df['0'], format="%Y-%m-%d %H:%M:%S")
     df['8月数量'] = df1['DATE0'].apply(lambda x: 1 if deadline > x.date() > starting_time else 0)
-    df1['DATE1'] = pd.to_datetime(df['1'], format="%Y-%m-%d")
-    df['8月数量'] = df['8月数量'] + df1['DATE1'].apply(lambda x: 1 if deadline > x.date() > starting_time else 0)
-    df1['DATE2'] = pd.to_datetime(df['2'], format="%Y-%m-%d")
-    df['8月数量'] = df['8月数量'] + df1['DATE2'].apply(lambda x: 1 if deadline > x.date() > starting_time else 0)
-    df1['DATE3'] = pd.to_datetime(df['3'], format="%Y-%m-%d")
-    df['8月数量'] = df['8月数量'] + df1['DATE3'].apply(lambda x: 1 if deadline > x.date() > starting_time else 0)
-    df1['DATE4'] = pd.to_datetime(df['4'], format="%Y-%m-%d")
-    df['8月数量'] = df['8月数量'] + df1['DATE4'].apply(lambda x: 1 if deadline > x.date() > starting_time else 0)
-    df1['DATE5'] = pd.to_datetime(df['5'], format="%Y-%m-%d")
-    df['8月数量'] = df['8月数量'] + df1['DATE5'].apply(lambda x: 1 if deadline > x.date() > starting_time else 0)
+    for i in ['1', '2', '3', '4', '5']:
+        try:
+            df1[i] = pd.to_datetime(df[i], format="%Y-%m-%d")
+        except ValueError:
+            df1[i] = pd.to_datetime(df[i], format="%Y-%m-%d %H:%M:%S")
+            df['8月数量'] = df['8月数量'] + df1[i].apply(lambda x: 1 if deadline > x.date() > starting_time else 0)
+        else:
+            df['8月数量'] = df['8月数量'] + df1[i].apply(lambda x: 1 if deadline > x.date() > starting_time else 0)
     writer = pd.ExcelWriter('output.xlsx')
     df.to_excel(writer, 'Sheet1')
     grouped = df['8月数量'].groupby(df['SQ']).sum()
